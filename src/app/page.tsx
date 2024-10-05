@@ -37,7 +37,7 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-100 to-orange-100 flex flex-col items-center justify-center p-4">
       <header className="w-full max-w-4xl flex justify-between items-center mb-12">
-        <Image src="/haleem.jpg" alt="Blog Logo" width={150} height={50} />
+        <Image src="/images/haleem.jpg" alt="Blog Logo" width={150} height={50} />
         {!isSignedIn && (
           <Button onClick={handleGoogleSignIn} disabled={isLoading}>
             Sign in with Google
