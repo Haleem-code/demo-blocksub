@@ -12,7 +12,7 @@ const articles = [
     date: "2023-09-15",
     readTime: "5 min read",
     notionLink: "https://www.notion.so/Embarking-on-Blockchain-My-Developer-Discoveries-DAY2-708f2536667e4a40af4bfeb809b579c5",
-    imageUrl: "/images/haleem.jpg"
+    imageUrl: "https://pbs.twimg.com/profile_images/1741829708528930816/MLNVLSF6_400x400.jpg"
   },
   {
     id: 2,
@@ -21,7 +21,7 @@ const articles = [
     date: "2023-09-20",
     readTime: "8 min read",
     notionLink: "https://www.notion.so/article2",
-    imageUrl: "/images/haleem.jpg"
+    imageUrl: "https://pbs.twimg.com/profile_images/1741829708528930816/MLNVLSF6_400x400.jpg"
   },
   {
     id: 3,
@@ -30,7 +30,7 @@ const articles = [
     date: "2023-09-25",
     readTime: "6 min read",
     notionLink: "https://www.notion.so/article3",
-    imageUrl: "/images/haleem.jpg"
+    imageUrl: "https://pbs.twimg.com/profile_images/1741829708528930816/MLNVLSF6_400x400.jpg"
   },
   {
     id: 4,
@@ -39,7 +39,7 @@ const articles = [
     date: "2023-09-30",
     readTime: "7 min read",
     notionLink: "https://www.notion.so/article4",
-    imageUrl: "/images/haleem.jpg"
+    imageUrl: "https://pbs.twimg.com/profile_images/1741829708528930816/MLNVLSF6_400x400.jpg"
   },
   {
     id: 5,
@@ -48,7 +48,7 @@ const articles = [
     date: "2023-10-05",
     readTime: "9 min read",
     notionLink: "https://www.notion.so/article5",
-imageUrl: "/images/haleem.jpg"
+imageUrl: "https://pbs.twimg.com/profile_images/1741829708528930816/MLNVLSF6_400x400.jpg"
   },
   {
     id: 6,
@@ -57,7 +57,7 @@ imageUrl: "/images/haleem.jpg"
     date: "2023-10-10",
     readTime: "10 min read",
     notionLink: "https://www.notion.so/article6",
-  imageUrl: "/images/haleem.jpg"
+  imageUrl: "https://pbs.twimg.com/profile_images/1741829708528930816/MLNVLSF6_400x400.jpg"
   }
 ]
 
