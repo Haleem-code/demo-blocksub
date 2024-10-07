@@ -1,144 +1,137 @@
-'use client';
-
-import { useState, useEffect, useCallback } from 'react';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+"use client";
+import { useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { BlockSubSDK } from 'blocksub-sdk';
+import { BlockSubSDK } from "blocksub-sdk";
 import {
   ConnectionProvider,
   WalletProvider,
   useWallet,
-} from '@solana/wallet-adapter-react';
-import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
-import { clusterApiUrl } from '@solana/web3.js';
-import { WalletModalProvider, WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import '@solana/wallet-adapter-react-ui/styles.css';
+} from "@solana/wallet-adapter-react";
+import { SolflareWalletAdapter } from "@solana/wallet-adapter-solflare";
+import {
+  WalletModalProvider,
+  WalletMultiButton,
+} from "@solana/wallet-adapter-react-ui";
+import "@solana/wallet-adapter-react-ui/styles.css";
+import { Connection, Keypair, Transaction, SystemProgram } from "@solana/web3.js";
 
-export default function AuthPage() {
+function AuthPageContent() {
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const [userName, setUserName] = useState('Anon');
+  const [userName, setUserName] = useState("Anon");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [sdk, setSdk] = useState<BlockSubSDK | null>(null);
-  const [buttonText, setButtonText] = useState('Sign in with Google');
   const router = useRouter();
-
-  const wallets = [new SolflareWalletAdapter()];
-  const { publicKey, connected } = useWallet();
-
-  // Keep this checkSubscriptionStatus function using useCallback
-  const checkSubscriptionStatus = useCallback(async () => {
-    if (sdk && publicKey) {
-      const subscriptionStatus = await sdk.checkSubscriptionStatus(publicKey.toString());
-      setIsSubscribed(subscriptionStatus);
-      setButtonText(subscriptionStatus ? 'Access the Blog' : 'Subscribe with Solana');
-    }
-  }, [sdk, publicKey]);
-
-  useEffect(() => {
-    if (connected && publicKey) {
-      const newSdk = new BlockSubSDK(
-        publicKey.toString(),
-        clusterApiUrl('devnet'),
-        'BvuGGNocQNB8ybd6mYjy9HScPc3hf2bUWnQjVzbmDRCF'
-      );
-      setSdk(newSdk);
-
-      // Update button text based on subscription status
-      checkSubscriptionStatus();
-    }
-  }, [connected, publicKey, checkSubscriptionStatus]);
+  const { publicKey, connected, sendTransaction } = useWallet();
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate network delay
     setIsSignedIn(true);
-    setUserName('Anon');
-    setButtonText('Connect Wallet');
+    setUserName("Anon");
     setIsLoading(false);
   };
 
   const handleSolanaSubscribe = async () => {
     setIsLoading(true);
     try {
-      if (sdk && publicKey) {
-        await sdk.subscribe(publicKey.toString(), 'premium_plan', 1000, 30); // Approx 0.01 SOL
-        const subscriptionStatus = await sdk.checkSubscriptionStatus(publicKey.toString());
-        setIsSubscribed(subscriptionStatus);
-        setButtonText('Access the Blog');
+      if (publicKey) {
+        // Initialize the SDK
+        const sdk = new BlockSubSDK(
+          publicKey.toString(),
+          "https://api.devnet.solana.com",
+          "BvuGGNocQNB8ybd6mYjy9HScPc3hf2bUWnQjVzbmDRCF"
+        );
+  
+        // Call the subscribe method
+        await sdk.subscribe(publicKey.toString(), "premium_plan", 1000, 30);
+  
+        const connection = new Connection("https://api.devnet.solana.com");
+        const subscriptionAccount = Keypair.generate();
+  
+        const transaction = new Transaction().add(
+          SystemProgram.transfer({
+            fromPubkey: publicKey,
+            toPubkey: subscriptionAccount.publicKey,
+            lamports: 1000,
+          })
+        );
+  
+        const signature = await sendTransaction(transaction, connection);
+        await connection.confirmTransaction(signature, "confirmed");
+  
+        alert("Subscription successful!");
+        setIsSubscribed(true);
       } else {
-        console.error('Wallet not connected or SDK not initialized');
+        console.error("Wallet not connected");
       }
     } catch (error) {
-      console.error('Subscription failed:', error);
+      console.error("Subscription failed:", error);
     }
     setIsLoading(false);
   };
+  
 
-  const handleGoToArticles = async () => {
-    if (!sdk || !publicKey) {
-      alert('Wallet not connected or SDK not initialized.');
-      return;
+  const handleGoToArticles = () => {
+    router.push("/articlepage");
+  };
+
+  const renderActionButton = () => {
+    if (!isSignedIn) {
+      return (
+        <Button onClick={handleGoogleSignIn} disabled={isLoading}>
+          {isLoading ? "Signing in..." : "Sign in with Google"}
+        </Button>
+      );
     }
 
-    try {
-      const subscriptionStatus = await sdk.checkSubscriptionStatus(publicKey.toString());
-      if (subscriptionStatus) {
-        router.push('/articlepage');
-      } else {
-        alert('Please subscribe to access the content.');
-      }
-    } catch (error) {
-      console.error('Error checking subscription status:', error);
-      alert('Failed to check subscription status.');
+    if (!connected) {
+      return <WalletMultiButton>Connect Wallet</WalletMultiButton>;
     }
+
+    if (!isSubscribed) {
+      return (
+        <Button onClick={handleSolanaSubscribe} disabled={isLoading}>
+          {isLoading ? "Subscribing..." : "Subscribe with Solana"}
+        </Button>
+      );
+    }
+
+    return <Button onClick={handleGoToArticles}>Access my blog</Button>;
   };
 
   return (
-    <ConnectionProvider endpoint={clusterApiUrl('devnet')}>
+    <div className="min-h-screen bg-gradient-to-br from-amber-100 to-orange-100 flex flex-col items-center justify-center p-4">
+      <header className="w-full max-w-4xl flex justify-between items-center mb-12">
+        <Image src="/images/haleem.jpg" alt="Blog Logo" width={50} height={50} />
+        <WalletMultiButton className="btn-wallet-connect" />
+      </header>
+
+      <main className="w-full max-w-md">
+        <Card className="p-8 space-y-6 bg-white/80 backdrop-blur-sm">
+          <h1 className="text-2xl font-bold text-center">Welcome {userName}</h1>
+          <p className="text-center text-gray-600">
+            {isSignedIn ? "You are signed in!" : "Please sign in with Google to continue."}
+          </p>
+
+          {renderActionButton()}
+        </Card>
+      </main>
+    </div>
+  );
+}
+
+export default function AuthPage() {
+  const wallets = [new SolflareWalletAdapter()];
+  const endpoint = "https://api.devnet.solana.com";
+
+  return (
+    <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
-          <div className="min-h-screen bg-gradient-to-br from-amber-100 to-orange-100 flex flex-col items-center justify-center p-4">
-            <header className="w-full max-w-4xl flex justify-between items-center mb-12">
-              <Image src="/images/haleem.jpg" alt="Blog Logo" width={50} height={50} />
-              {!isSignedIn ? (
-                <Button onClick={handleGoogleSignIn} disabled={isLoading}>
-                  {isLoading ? 'Signing in...' : 'Sign in with Google'}
-                </Button>
-              ) : (
-                <WalletMultiButton className="btn-wallet-connect" />
-              )}
-            </header>
-
-            <main className="w-full max-w-md">
-              <Card className="p-8 space-y-6 bg-white/80 backdrop-blur-sm">
-                <h1 className="text-2xl font-bold text-center">Welcome {userName}</h1>
-                <p className="text-center text-gray-600">
-                  {isSignedIn ? 'You are signed in with Google!' : 'Please sign in with Google to continue.'}
-                </p>
-
-                {isSignedIn && !connected && (
-                  <WalletMultiButton className="btn-wallet-connect">
-                    {buttonText}
-                  </WalletMultiButton>
-                )}
-
-                {connected && !isSubscribed && (
-                  <Button onClick={handleSolanaSubscribe} disabled={isLoading}>
-                    {isLoading ? 'Subscribing...' : buttonText}
-                  </Button>
-                )}
-
-                {isSubscribed && (
-                  <Button onClick={handleGoToArticles}>
-                    {buttonText}
-                  </Button>
-                )}
-              </Card>
-            </main>
-          </div>
+          <AuthPageContent />
         </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
