@@ -126,6 +126,11 @@ function AuthPageContent() {
 export default function AuthPage() {
   const wallets = [new SolflareWalletAdapter()];
   const endpoint = "https://api.devnet.solana.com";
+  // Check if the endpoint is valid
+  
+if (!endpoint.startsWith('http')) {
+  console.error("Invalid endpoint:", endpoint);
+}
 
   return (
     <ConnectionProvider endpoint={endpoint}>
