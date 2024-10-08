@@ -42,45 +42,59 @@ function AuthPageContent() {
   };
 
   const handleSolanaSubscribe = async () => {
+    setIsLoading(true);
+    
+    // Ensure publicKey exists and endpoint is correct
     if (!publicKey) {
       console.error("Wallet not connected");
-      return; // Exit if no public key is present
+      setIsLoading(false);
+      return;
     }
-
-    setIsLoading(true);
+  
+    console.log("PublicKey:", publicKey.toString());
+    
     try {
       // Initialize the SDK
       const sdk = new BlockSubSDK(
         publicKey.toString(),
-        "https://api.devnet.solana.com",
-        "BvuGGNocQNB8ybd6mYjy9HScPc3hf2bUWnQjVzbmDRCF"
+        "https://api.devnet.solana.com", // Check the endpoint
+        "BvuGGNocQNB8ybd6mYjy9HScPc3hf2bUWnQjVzbmDRCF" // contract address
       );
-
-      // Call the subscribe method
+  
+      console.log("SDK Initialized. Subscribing...");
+      
+      // subscribe method
       await sdk.subscribe(publicKey.toString(), "premium_plan", 1000, 30);
-
+      console.log("Subscription request sent.");
+  
+      // Solana transaction process
       const connection = new Connection("https://api.devnet.solana.com");
       const subscriptionAccount = Keypair.generate();
-
+  
       const transaction = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey: publicKey,
           toPubkey: subscriptionAccount.publicKey,
-          lamports: 1000,
+          lamports: 1000, // 0.01 sol
         })
       );
-
+  
+      console.log("Sending transaction...");
       const signature = await sendTransaction(transaction, connection);
-      await connection.confirmTransaction(signature, "confirmed");
-
+      console.log("Transaction signature:", signature);
+  
+      const confirmation = await connection.confirmTransaction(signature, "confirmed");
+      console.log("Transaction confirmed:", confirmation);
+  
       alert("Subscription successful!");
       setIsSubscribed(true);
     } catch (error) {
       console.error("Subscription failed:", error);
-    } finally {
-      setIsLoading(false);
     }
+  
+    setIsLoading(false);
   };
+  
 
   const handleGoToArticles = () => {
     router.push("/articlepage");
@@ -151,3 +165,4 @@ export default function AuthPage() {
     </ConnectionProvider>
   );
 }
+//having issues with solana devnet endpoint not responding
