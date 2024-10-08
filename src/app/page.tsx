@@ -5,7 +5,7 @@ export default function HomePage() {
     <div>
       <h1>Welcome to the Blog!</h1>
       <p>
-        Click <Link href="/auth">here</Link> to authenticate.
+        Click <Link href="/auth" className="text-purple-800">here</Link> to authenticate.
       </p>
     </div>
   );

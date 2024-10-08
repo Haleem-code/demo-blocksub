@@ -48,15 +48,12 @@ function AuthPageContent() {
   };
 
   const handleSolanaSubscribe = async () => {
-    setIsLoading(true);
-    
-    // checking if public key exist
     if (!publicKey) {
       console.error("Wallet not connected");
-      setIsLoading(false);
       return;
     }
-  
+
+    setIsLoading(true);
     console.log("PublicKey:", publicKey.toString());
     
     try {
@@ -69,12 +66,12 @@ function AuthPageContent() {
   
       console.log("SDK Initialized. Subscribing...");
       
-      // subscribe method
+      // Subscribe to the service
       await sdk.subscribe(publicKey.toString(), "premium_plan", 1000, 30);
       console.log("Subscription request sent.");
   
-      // Solana transaction process
-      const connection = new Connection(clusterApiUrl("devnet")); // Using clusterApiUrl for devnet
+      // Prepare the Solana transaction
+      const connection = new Connection(clusterApiUrl("devnet"));
       const subscriptionAccount = Keypair.generate();
   
       const transaction = new Transaction().add(
@@ -96,11 +93,11 @@ function AuthPageContent() {
       setIsSubscribed(true);
     } catch (error) {
       console.error("Subscription failed:", error);
+      alert("Subscription failed. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
-  
-    setIsLoading(false);
   };
-  
 
   const handleGoToArticles = () => {
     router.push("/articlepage");
@@ -154,7 +151,7 @@ function AuthPageContent() {
 
 export default function AuthPage() {
   const wallets = [new SolflareWalletAdapter()];
-  const endpoint = clusterApiUrl("devnet"); // Using clusterApiUrl for devnet
+  const endpoint = clusterApiUrl("devnet");
 
   // Check if the endpoint is valid
   if (!endpoint.startsWith("http")) {
@@ -171,4 +168,5 @@ export default function AuthPage() {
     </ConnectionProvider>
   );
 }
+
 //having issues with devenet rpc url
