@@ -16,7 +16,13 @@ import {
   WalletMultiButton,
 } from "@solana/wallet-adapter-react-ui";
 import "@solana/wallet-adapter-react-ui/styles.css";
-import { Connection, Keypair, Transaction, SystemProgram } from "@solana/web3.js";
+import {
+  Connection,
+  Keypair,
+  Transaction,
+  SystemProgram,
+  clusterApiUrl,
+} from "@solana/web3.js";
 
 function AuthPageContent() {
   const [isSignedIn, setIsSignedIn] = useState(false);
@@ -44,7 +50,7 @@ function AuthPageContent() {
   const handleSolanaSubscribe = async () => {
     setIsLoading(true);
     
-    // Ensure publicKey exists and endpoint is correct
+    // checking if public key exist
     if (!publicKey) {
       console.error("Wallet not connected");
       setIsLoading(false);
@@ -57,7 +63,7 @@ function AuthPageContent() {
       // Initialize the SDK
       const sdk = new BlockSubSDK(
         publicKey.toString(),
-        "https://api.devnet.solana.com", // Check the endpoint
+        clusterApiUrl("devnet"), // Using clusterApiUrl for devnet
         "BvuGGNocQNB8ybd6mYjy9HScPc3hf2bUWnQjVzbmDRCF" // contract address
       );
   
@@ -68,7 +74,7 @@ function AuthPageContent() {
       console.log("Subscription request sent.");
   
       // Solana transaction process
-      const connection = new Connection("https://api.devnet.solana.com");
+      const connection = new Connection(clusterApiUrl("devnet")); // Using clusterApiUrl for devnet
       const subscriptionAccount = Keypair.generate();
   
       const transaction = new Transaction().add(
@@ -148,7 +154,7 @@ function AuthPageContent() {
 
 export default function AuthPage() {
   const wallets = [new SolflareWalletAdapter()];
-  const endpoint = "https://api.devnet.solana.com";
+  const endpoint = clusterApiUrl("devnet"); // Using clusterApiUrl for devnet
 
   // Check if the endpoint is valid
   if (!endpoint.startsWith("http")) {
@@ -165,4 +171,4 @@ export default function AuthPage() {
     </ConnectionProvider>
   );
 }
-//having issues with solana devnet endpoint not responding
+//having issues with devenet rpc url
