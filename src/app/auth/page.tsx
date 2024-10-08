@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,13 @@ function AuthPageContent() {
   const router = useRouter();
   const { publicKey, connected, sendTransaction } = useWallet();
 
+  // Log when wallet is connected
+  useEffect(() => {
+    if (connected && publicKey) {
+      console.log("Wallet connected with public key:", publicKey.toString());
+    }
+  }, [connected, publicKey]);
+
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate network delay
@@ -35,49 +42,51 @@ function AuthPageContent() {
   };
 
   const handleSolanaSubscribe = async () => {
+    if (!publicKey) {
+      console.error("Wallet not connected");
+      return; // Exit if no public key is present
+    }
+
     setIsLoading(true);
     try {
-      if (publicKey) {
-        // Initialize the SDK
-        const sdk = new BlockSubSDK(
-          publicKey.toString(),
-          "https://api.devnet.solana.com",
-          "BvuGGNocQNB8ybd6mYjy9HScPc3hf2bUWnQjVzbmDRCF"
-        );
-  
-        // Call the subscribe method
-        await sdk.subscribe(publicKey.toString(), "premium_plan", 1000, 30);
-  
-        const connection = new Connection("https://api.devnet.solana.com");
-        const subscriptionAccount = Keypair.generate();
-  
-        const transaction = new Transaction().add(
-          SystemProgram.transfer({
-            fromPubkey: publicKey,
-            toPubkey: subscriptionAccount.publicKey,
-            lamports: 1000,
-          })
-        );
-  
-        const signature = await sendTransaction(transaction, connection);
-        await connection.confirmTransaction(signature, "confirmed");
-  
-        alert("Subscription successful!");
-        setIsSubscribed(true);
-      } else {
-        console.error("Wallet not connected");
-      }
+      // Initialize the SDK
+      const sdk = new BlockSubSDK(
+        publicKey.toString(),
+        "https://api.devnet.solana.com",
+        "BvuGGNocQNB8ybd6mYjy9HScPc3hf2bUWnQjVzbmDRCF"
+      );
+
+      // Call the subscribe method
+      await sdk.subscribe(publicKey.toString(), "premium_plan", 1000, 30);
+
+      const connection = new Connection("https://api.devnet.solana.com");
+      const subscriptionAccount = Keypair.generate();
+
+      const transaction = new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey: publicKey,
+          toPubkey: subscriptionAccount.publicKey,
+          lamports: 1000,
+        })
+      );
+
+      const signature = await sendTransaction(transaction, connection);
+      await connection.confirmTransaction(signature, "confirmed");
+
+      alert("Subscription successful!");
+      setIsSubscribed(true);
     } catch (error) {
       console.error("Subscription failed:", error);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
-  
 
   const handleGoToArticles = () => {
     router.push("/articlepage");
   };
 
+  // Render buttons based on sign-in, wallet connection, and subscription status
   const renderActionButton = () => {
     if (!isSignedIn) {
       return (
@@ -126,11 +135,11 @@ function AuthPageContent() {
 export default function AuthPage() {
   const wallets = [new SolflareWalletAdapter()];
   const endpoint = "https://api.devnet.solana.com";
+
   // Check if the endpoint is valid
-  
-if (!endpoint.startsWith('http')) {
-  console.error("Invalid endpoint:", endpoint);
-}
+  if (!endpoint.startsWith("http")) {
+    console.error("Invalid endpoint:", endpoint);
+  }
 
   return (
     <ConnectionProvider endpoint={endpoint}>
