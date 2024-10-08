@@ -1,4 +1,4 @@
-"use client";
+ "use client";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -55,25 +55,25 @@ function AuthPageContent() {
 
     setIsLoading(true);
     console.log("PublicKey:", publicKey.toString());
-    
+
     try {
       // Initialize the SDK
       const sdk = new BlockSubSDK(
         publicKey.toString(),
-        clusterApiUrl("testnet"), // Using clusterApiUrl for devnet
+        clusterApiUrl("devnet"), // Changed to devnet
         "BvuGGNocQNB8ybd6mYjy9HScPc3hf2bUWnQjVzbmDRCF" // contract address
       );
-  
+
       console.log("SDK Initialized. Subscribing...");
-      
+
       // Subscribe to the service
       await sdk.subscribe(publicKey.toString(), "premium_plan", 1000, 30);
       console.log("Subscription request sent.");
-  
+
       // Prepare the Solana transaction
-      const connection = new Connection(clusterApiUrl("testnet"));
+      const connection = new Connection(clusterApiUrl("devnet")); // Changed to devnet
       const subscriptionAccount = Keypair.generate();
-  
+
       const transaction = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey: publicKey,
@@ -81,14 +81,14 @@ function AuthPageContent() {
           lamports: 1000, // 0.01 sol
         })
       );
-  
+
       console.log("Sending transaction...");
       const signature = await sendTransaction(transaction, connection);
       console.log("Transaction signature:", signature);
-  
+
       const confirmation = await connection.confirmTransaction(signature, "confirmed");
       console.log("Transaction confirmed:", confirmation);
-  
+
       alert("Subscription successful!");
       setIsSubscribed(true);
     } catch (error) {
@@ -151,12 +151,7 @@ function AuthPageContent() {
 
 export default function AuthPage() {
   const wallets = [new SolflareWalletAdapter()];
-  const endpoint = clusterApiUrl("testnet");
-
-  // Check if the endpoint is valid
-  if (!endpoint.startsWith("http")) {
-    console.error("Invalid endpoint:", endpoint);
-  }
+  const endpoint = clusterApiUrl("devnet"); // Changed to devnet
 
   return (
     <ConnectionProvider endpoint={endpoint}>
@@ -168,5 +163,3 @@ export default function AuthPage() {
     </ConnectionProvider>
   );
 }
-
-//having issues with devenet rpc url
