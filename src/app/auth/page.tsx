@@ -60,7 +60,7 @@ function AuthPageContent() {
       // Initialize the SDK
       const sdk = new BlockSubSDK(
         publicKey.toString(),
-        clusterApiUrl("devnet"), // Using clusterApiUrl for devnet
+        clusterApiUrl("testnet"), // Using clusterApiUrl for devnet
         "BvuGGNocQNB8ybd6mYjy9HScPc3hf2bUWnQjVzbmDRCF" // contract address
       );
   
@@ -71,7 +71,7 @@ function AuthPageContent() {
       console.log("Subscription request sent.");
   
       // Prepare the Solana transaction
-      const connection = new Connection(clusterApiUrl("devnet"));
+      const connection = new Connection(clusterApiUrl("testnet"));
       const subscriptionAccount = Keypair.generate();
   
       const transaction = new Transaction().add(
@@ -151,7 +151,7 @@ function AuthPageContent() {
 
 export default function AuthPage() {
   const wallets = [new SolflareWalletAdapter()];
-  const endpoint = clusterApiUrl("devnet");
+  const endpoint = clusterApiUrl("testnet");
 
   // Check if the endpoint is valid
   if (!endpoint.startsWith("http")) {
