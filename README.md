@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+BlockSub SDK Demo Application
 
-## Getting Started
+Overview
 
-First, run the development server:
+This BlockSub SDK Demo Application demonstrates the integration of the BlockSub SDK into a simple web application. BlockSub is a subscription management solution that allows developers to manage user subscriptions effortlessly. This demo showcases how to use the SDK to handle user subscriptions, view subscription status, and interact with the BlockSub platform.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+The demo application serves as a guide for developers integrating BlockSub into their own projects and provides example code for common use cases such as subscribing users, fetching subscription status, and managing subscriptions.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Key Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+User Authentication: Allows users to log in and out (not functional).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Subscription Management: Provides functionality to subscribe, a d approve transaction after connecting wallet.
 
-## Learn More
+BlockSub SDK Integration: Demonstrates how to set up and interact with the SDK.
 
-To learn more about Next.js, take a look at the following resources:
+Subscription Status: to check if a user has subscribed 
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Error Handling: Handles common errors like failed connect wallet and subscription.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+System Requirements
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Frontend: Nextjs  and blocksub SDK 
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+BlockSub SDK: You must have an API key to interact with the BlockSub SDK. (WIP)
+
+
+Demo Application Features
+
+1. User Authentication:
+
+User login using email and password or OAuth (Google, Facebook, etc.).
+
+Secure user sessions using JWT or cookies.
+
+
+
+2. Subscription Workflow:
+
+Subscription function fetched from BlockSub SDK.
+
+User can subscribe with just 2 clicks.
+
+On successful subscription, the app displays the subscription details and renewal period.
+
+
+
+3. Subscription Management:
+
+Developers can view, update, or cancel their subscriptions directly from the app.
+
+Display of active/inactive subscription status, next billing date, and plan details. (all in the platform dashboard (WIP) )
+
+
+
+4. Error Handling:
+
+Handling of various errors like failed subscription, RPC endpoint failure , invalid API responses.
